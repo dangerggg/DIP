@@ -1,4 +1,5 @@
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -25,22 +26,39 @@ def img_gamma(img, gamma):
 
 
 def histogram_calculating(img):
-    histogram = np.zeros(img.shape[2], 256)
-    for dimension in range(0, 2):
-        histogram
-    r = np.array(img[:, :, 0]).flatten()
-    histogram[0] = np.histogram(r, (0, 255))
+    histogram = np.zeros([256, img.shape[2]])
+    for g in range(0, 256):
+        histogram[g, :] = sum(sum(img == g))
+    return histogram
 
 
+def cdf_calculating(histogram, img):
+    cdf = np.zeros([256, img.shape[2]])
+    tot = sum(histogram)
+    for g in range(0, 256):
+        cdf[g] = sum(histogram[0:g + 1]) / tot
+    return cdf
 
 
-def img_histogram_balance():
-    return 0
+def img_histogram_balance(img):
+    histogram = histogram_calculating(img)
+    cdf = cdf_calculating(histogram, img)
+    (B, G, R) = cv2.split(img)
+    return cv2.merge([(cdf[B] * 255)[:, :, 0], (cdf[G] * 255)[:, :, 1], (cdf[R] * 255)[:, :, 2]])
+
+
+def img_histogram_matching(src, dst):
+    histogram = histogram_calculating(src)
+    cdf_src = cdf_calculating(histogram, src)
+    histogram = histogram_calculating(dst)
+    cdf_dst = cdf_calculating(histogram, dst)
 
 
 def main():
-    img = cv2.imread("./千寻.jpg")
-    GreyImg = np.zeros(img.shape, dtype=np.int)
+    img = cv2.imread("./qianxun.jpg")
+    img_p = cv2.imread("./people.jpg")
+
+    """GreyImg = np.zeros(img.shape, dtype=np.int)
     BrightenImg = np.zeros(img.shape, dtype=np.int)
     row_cnt = -1
     col_cnt = -1
@@ -57,7 +75,8 @@ def main():
     cv2.imwrite("qianxun_contrast.jpg", img_contrast(img, 1.5))
     cv2.imwrite("qianxun_brighten.jpg", img_brighten(img, 50))
     cv2.imwrite("qianxun_gamma.jpg", img_gamma(img, 1.5))
-
+    cv2.imwrite("people_equlization.jpg", img_histogram_balance(img_p))"""
+    img_histogram_matching(img_p, img)
 
 if __name__ == '__main__':
     main()
