@@ -47,16 +47,36 @@ def img_histogram_balance(img):
     return cv2.merge([(cdf[B] * 255)[:, :, 0], (cdf[G] * 255)[:, :, 1], (cdf[R] * 255)[:, :, 2]])
 
 
-def img_histogram_matching(src, dst):
+def img_histogram_matching(src, dst, cdf_src, cdf_dst):
+    out = np.zeros(src.shape)
+    mj = np.min(dst)
+    Mj = np.max(dst)
+    mi = np.min(src)
+    Mi = np.max(src)
+    gj = mj
+    for gi in range(mi, Mi + 1):
+        while (gj < 255 and cdf_src[gi] < 1) and cdf_dst[gj] < cdf_src[gi]:
+            gj = gj + 1
+        out = out + gj * (src == gi)
+    return out
+
+
+def multi_band_matching(src, dst):
     histogram = histogram_calculating(src)
     cdf_src = cdf_calculating(histogram, src)
     histogram = histogram_calculating(dst)
     cdf_dst = cdf_calculating(histogram, dst)
+    (B, G, R) = cv2.split(src)
+    (B1, G1, R1) = cv2.split(dst)
+    return cv2.merge([img_histogram_matching(B, B1, cdf_src[:, 0], cdf_dst[:, 0]),
+                      img_histogram_matching(G, G1, cdf_src[:, 1], cdf_dst[:, 1]),
+                      img_histogram_matching(R, R1, cdf_src[:, 2], cdf_dst[:, 2])])
 
 
 def main():
     img = cv2.imread("./qianxun.jpg")
     img_p = cv2.imread("./people.jpg")
+    meizi = cv2.imread("./human.jpg")
 
     """GreyImg = np.zeros(img.shape, dtype=np.int)
     BrightenImg = np.zeros(img.shape, dtype=np.int)
@@ -74,9 +94,11 @@ def main():
     cv2.imwrite("qianxun_darken.jpg", BrightenImg)
     cv2.imwrite("qianxun_contrast.jpg", img_contrast(img, 1.5))
     cv2.imwrite("qianxun_brighten.jpg", img_brighten(img, 50))
-    cv2.imwrite("qianxun_gamma.jpg", img_gamma(img, 1.5))
-    cv2.imwrite("people_equlization.jpg", img_histogram_balance(img_p))"""
-    img_histogram_matching(img_p, img)
+    cv2.imwrite("qianxun_gamma.jpg", img_gamma(img, 1.5))"""
+    cv2.imwrite("people_equlization.jpg", img_histogram_balance(img_p))
+
+    cv2.imwrite("people_matching.jpg", multi_band_matching(meizi, img))
+
 
 if __name__ == '__main__':
     main()
