@@ -78,7 +78,7 @@ def main():
     img_p = cv2.imread("./people.jpg")
     meizi = cv2.imread("./human.jpg")
 
-    """GreyImg = np.zeros(img.shape, dtype=np.int)
+    GreyImg = np.zeros(img.shape, dtype=np.int)
     BrightenImg = np.zeros(img.shape, dtype=np.int)
     row_cnt = -1
     col_cnt = -1
@@ -94,9 +94,8 @@ def main():
     cv2.imwrite("qianxun_darken.jpg", BrightenImg)
     cv2.imwrite("qianxun_contrast.jpg", img_contrast(img, 1.5))
     cv2.imwrite("qianxun_brighten.jpg", img_brighten(img, 50))
-    cv2.imwrite("qianxun_gamma.jpg", img_gamma(img, 1.5))"""
+    cv2.imwrite("qianxun_gamma.jpg", img_gamma(img, 1.5))
     cv2.imwrite("people_equlization.jpg", img_histogram_balance(img_p))
-
     cv2.imwrite("people_matching.jpg", multi_band_matching(meizi, img))
 
 
