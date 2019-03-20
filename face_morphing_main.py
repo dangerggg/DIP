@@ -11,7 +11,7 @@ def region_coloring(loc_list, img):
 
 
 def main():
-    img = cv2.imread("girl.jpg")
+    img = cv2.imread("people.jpg")
     face_marks = face.face_keypoint_recognition(img)
     for key in face_marks[0]:
        img = region_coloring(face_marks[0][key], img)
