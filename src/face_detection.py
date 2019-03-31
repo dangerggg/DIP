@@ -8,3 +8,5 @@ def face_keypoint_recognition(img):
     return face_landmarks_list
 
 
+def triangular_mesh(img, loc_list):
+    return 0
